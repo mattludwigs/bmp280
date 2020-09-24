@@ -1,6 +1,6 @@
 defmodule BMP280.Calc do
   alias BMP280.{Calibration, Measurement}
-
+  require Logger
   @moduledoc false
 
   @doc """
@@ -8,8 +8,12 @@ defmodule BMP280.Calc do
   """
   @spec raw_to_measurement(Calibration.t(), number(), map()) :: Measurement.t()
   def raw_to_measurement(%Calibration{} = cal, sea_level_pa, raw) do
+    Logger.warn("cal=#{inspect(cal)}")
     temp = raw_to_temperature(cal, raw.raw_temperature)
+    Logger.warn("raw_temp=#{inspect(raw.raw_temperature)}->#{inspect(temp)}")
+
     pressure = raw_to_pressure(cal, temp, raw.raw_pressure)
+    Logger.warn("raw_pressure=#{inspect(raw.raw_pressure)}->#{inspect(pressure)}")
     altitude = pressure_to_altitude(pressure, sea_level_pa)
     humidity = raw_to_humidity(cal, temp, Map.get(raw, :raw_humidity))
 
@@ -51,15 +55,16 @@ defmodule BMP280.Calc do
 
   defp raw_to_humidity(%{has_humidity?: true} = cal, temp, raw_humidity)
        when is_integer(raw_humidity) do
-    t_fine = temp * 5120
+    0
+    # t_fine = temp * 5120
 
-    v_x1_u32r = t_fine - 76800
+    # v_x1_u32r = t_fine - 76800
 
-    v_x1_u32r =
-      (raw_humidity * 16384 - cal.dig_H4 * 1_048_576 -
-        cal.dig_H5 * v_x1_u32r) / 32768
-        + (v_x1_u32r*cal.dig_H6/1024 * v_x1_u32r*cal.dig_H3/ 2048)
-        + ()
+    # v_x1_u32r =
+    #   (raw_humidity * 16384 - cal.dig_H4 * 1_048_576 -
+    #     cal.dig_H5 * v_x1_u32r) / 32768
+    #     + (v_x1_u32r*cal.dig_H6/1024 * v_x1_u32r*cal.dig_H3/ 2048)
+    #     + ()
   end
 
   defp raw_to_humidity(_cal, _temp, _raw), do: 0
