@@ -16,6 +16,7 @@ defmodule BMP280.Calc do
     Logger.warn("raw_pressure=#{inspect(raw.raw_pressure)}->#{inspect(pressure)}")
     altitude = pressure_to_altitude(pressure, sea_level_pa)
     humidity = raw_to_humidity(cal, temp, Map.get(raw, :raw_humidity))
+    Logger.warn("raw_pressure=#{inspect(Map.get(raw, :raw_humidity))}->#{inspect(humidity)}")
 
     %Measurement{
       temperature_c: temp,
